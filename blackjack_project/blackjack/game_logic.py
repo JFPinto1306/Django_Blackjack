@@ -2,19 +2,53 @@ from .models import Card, Deck, Game
 
 class Blackjack:
     def __init__(self):
-        self.game = Game.objects.first()
-        self.deck = Deck.objects.first()
-        self.player_hand= list(self.game.player_hand.all())
-        self.dealer_hand= list(self.game.dealer_hand.all())
+        # Ensure a deck exists or create one
+        self.deck, _ = Deck.objects.get_or_create()
+        if not self.deck.cards.exists():  # Start a new deck if it's empty
+            self.deck.start_deck()
+
+        # Ensure a game exists or create one
+        self.game, _ = Game.objects.get_or_create()
+
+        # Fetch hands
+        self.player_hand = list(self.game.player_hand.all())
+        self.dealer_hand = list(self.game.dealer_hand.all())
+        
+    def calculate_score(self, hand):
+        score = 0
+        for card in hand:
+            card_value = card.get_card_value(score)
+            #print(f"Card: {card}, Value: {card_value}")  # Debugging each card
+            score += card_value
+        #print(f"Final Score: {score}")  # Debugging the total score
+        return score if score <= 21 else "Bust"
+        
+    def start_game(self):
+        if not self.deck.cards.exists():
+            self.deck.start_deck()
+            
+        # Reset game state
+        self.game.player_hand.clear()
+        self.game.dealer_hand.clear()
+        self.game.status = "STARTED"
+        self.game.save()
         
     def calculate_score(self,hand):
         score = 0
         for card in hand:
-            score += card.get_value(score)
+            score += int(card.get_card_value(score))
         return score if score <= 21 else "Bust"
         
     def start_game(self):
         self.deck.start_deck()
+        #self.deck.shuffle_deck()
+        
+
+        # Reset game state
+        self.game.player_hand.clear()
+        self.game.dealer_hand.clear()
+        
+        # Starting Game
         self.game.status = "STARTED"
         self.game.save()
         
@@ -31,7 +65,7 @@ class Blackjack:
         
     def hit(self,hand):
         # Deal one card to the hand
-        card = self.deck.deal_card()
+        card = self.deck.deal_card(hand)
         if card:
             hand.append(card)
         return self.calculate_score(hand)

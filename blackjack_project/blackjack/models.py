@@ -24,12 +24,12 @@ class Card(models.Model):
     def __str__(self):
         return f"{self.value} of {self.suit}"
     
-    def get_card_value(self, current_score=0):
+    def get_card_value(self, score):
         if self.value in ['J', 'Q', 'K']:
             return 10
         elif self.value == 'A':
             # Ace value is 11 unless it causes a bust (score > 21), in which case it is 1
-            if current_score + 11 > 21:
+            if score + 11 > 21:
                 return 1
             else:
                 return 11
@@ -62,35 +62,41 @@ class Deck(models.Model):
     cards = models.ManyToManyField(Card)
 
     def shuffle_deck(self):
-        # Shuffle the cards in the deck by fetching the cards into a list
-        cards = list(self.cards.all())  # Convert ManyToMany to a list
-        random.shuffle(cards)  # Shuffle the list of cards
-        self.cards.set(cards)  # Update the deck with shuffled cards
-
-    def start_deck(self):
-        # Create a full deck of 52 cards at the start of the game
+        # Step 1: Create a full deck of 52 cards
         new_cards = []
-        for suit_choice in Card.SUIT_CHOICES:  # Using Card's SUIT_CHOICES
-            for value_choice in Card.VALUE_CHOICES:  # Using Card's VALUE_CHOICES
+
+        for suit_choice in Card.SUIT_CHOICES:
+            for value_choice in Card.VALUE_CHOICES:
                 # Create each card instance based on the choices
                 card = Card.objects.create(suit=suit_choice[0], value=value_choice[0])
                 new_cards.append(card)
 
-        # Add cards to the deck
-        self.cards.set(new_cards)  # This sets all the created cards to the deck
-        self.shuffle_deck()  # Shuffle the cards once they are added
+
+
+        # Step 2: Shuffle the deck
+        random.shuffle(list(set(new_cards)))  # Shuffle the cards in place
+
+        # Step 3: Add shuffled cards to the deck
+        self.cards.set(new_cards)  # This sets all the shuffled cards to the deck
         self.save()
 
-    def deal_card(self,hand):
-        # Deal a card from the deck
-        card = self.cards.first()
+        # Debugging: Ensure deck has 52 cards after shuffle
+        #print(f"Deck: {self.cards.all()}")
+
+    def start_deck(self):
+        # Simply call shuffle_deck() to populate and shuffle the deck
+        self.shuffle_deck()
+
+
+    def deal_card(self, hand):
+        card = random.choice(self.cards.all())
         card.is_dealt = True
-        
-        # Remove the dealt card from the deck
+        card.save()
         self.cards.remove(card)
-        self.save()
-        
-        hand.add(card)
+        self.save()  # Save the deck after removing the card
+
+        hand.append(card)  # Add the card to the hand
+
         return card
     
     def reset_deck(self):
