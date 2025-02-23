@@ -58,18 +58,64 @@ class GameModelTest(TestCase):
 
 class GameLogicTest(TestCase):
     def setUp(self):
-        print("\nSetting up the test")
         # Create the Blackjack instance and store it as an instance variable
         self.blackjack = Blackjack()  # This will initialize the Deck and Game
         self.blackjack.start_game()
-
+        
+    def test_hit(self):
+        
+        print("\nTesting hit method")
+        
         # Debug: Print player's hand and dealer's hand
-        print("Player's hand:", self.blackjack.player_hand)
-        print("Dealer's hand:", self.blackjack.dealer_hand)
+        print("Player's hand:", self.blackjack.player_hand.all())
+        print("Dealer's hand:", self.blackjack.dealer_hand.all())
+        
+        #######################################
+        # Hit the player's hand
+        #######################################
+        self.blackjack.hit(self.blackjack.game.player_hand)  
+        print("Player hand after hit:", self.blackjack.game.player_hand.all())  # QuerySet
+        
+        # Checking Player Hand now has 3 cards
+        self.assertEqual(self.blackjack.game.player_hand.count(), 3)
+        
+        # Calculating 3 card hand score
+        player_score = self.blackjack.calculate_score(self.blackjack.game.player_hand)
+        
+        # Printing new hand
+        print("Player score after hit:", player_score)
+        
+        # Asserting player score is greater than 0
+        if player_score == "Bust":
+            self.assertEqual(player_score, "Bust")
+        else:
+            self.assertGreater(player_score, 0)
+            
+        #######################################
+        # Hit the dealer's hand
+        #######################################
+        
+        # Hit the dealer's hand
+        self.blackjack.hit(self.blackjack.game.dealer_hand)
+        print("Dealer hand after hit:", self.blackjack.game.dealer_hand.all())
+        
+        # Checking Player Hand now has 3 cards
+        self.assertEqual(self.blackjack.game.dealer_hand.count(), 3)        
+        dealer_score = self.blackjack.calculate_score(self.blackjack.game.dealer_hand.all())
+        print("Dealer score after hit:", dealer_score)
+        if dealer_score == "Bust":
+            self.assertEqual(dealer_score, "Bust")
+        else:
+            self.assertGreater(dealer_score, 0)  
+
 
     def test_start_game(self):
-        pass
+
         print("\nTesting start_game method")
+        # Debug: Print player's hand and dealer's hand
+        print("Player's hand:", self.blackjack.player_hand.all())
+        print("Dealer's hand:", self.blackjack.dealer_hand.all())
+        
         # Debug: Print the player's hand
         self.assertEqual(self.blackjack.game.status, 'IN_PROGRESS')
         self.assertEqual(self.blackjack.game.player_hand.count(), 2)
@@ -91,25 +137,5 @@ class GameLogicTest(TestCase):
         winner = self.blackjack.get_winner()
         print("Winner:", winner)
         self.assertIn(winner, ['Player', 'Dealer', 'Draw'])
-        
-    def test_hit(self):
-        print("\nTesting hit method")
-        # Hit the player's hand
-        self.blackjack.hit(self.blackjack.game.player_hand)  
-        
-        # Checking Player Hand now has 3 cards
-        self.assertEqual(self.blackjack.game.player_hand.count(), 3)
-        
-        # Calculating 3 card hand score
-        player_score = self.blackjack.calculate_score(self.blackjack.game.player_hand)
-        
-        # Printing new hand
-        print("Player hand after hit:", self.blackjack.game.player_hand.all())  # QuerySet
-        #print("Player score after hit:", player_score)
-        
-        #if player_score == "Bust":
-            #self.assertEqual(player_score, "Bust")
-        #else:
-        #    self.assertGreater(player_score, 0)
 
         

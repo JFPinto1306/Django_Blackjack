@@ -11,12 +11,12 @@ class Blackjack:
         self.game, _ = Game.objects.get_or_create()
 
         # Fetch hands directly using ManyToManyManager (no need for list conversion)
-        self.player_hand = self.game.player_hand.all()
-        self.dealer_hand = self.game.dealer_hand.all()
+        self.player_hand = self.game.player_hand
+        self.dealer_hand = self.game.dealer_hand
 
     def calculate_score(self, hand):
         score = 0
-        for card in hand:
+        for card in hand.all():
             score += card.get_card_value(score)
         return score if score <= 21 else "Bust"
 
@@ -32,12 +32,12 @@ class Blackjack:
         self.game.save()
 
         # Dealing Player Hand
-        self.deck.deal_card(self.game.player_hand)
-        self.deck.deal_card(self.game.player_hand)
+        self.deck.deal_card(self.player_hand)
+        self.deck.deal_card(self.player_hand)
 
         # Dealing Dealer Hand
-        self.deck.deal_card(self.game.dealer_hand)
-        self.deck.deal_card(self.game.dealer_hand)
+        self.deck.deal_card(self.dealer_hand)
+        self.deck.deal_card(self.dealer_hand)
 
         self.game.status = "IN_PROGRESS"
         self.game.save()
@@ -51,17 +51,28 @@ class Blackjack:
             # You don't need to append here, since the deal_card method handles that
             pass
 
-        #return self.calculate_score(hand.all())
+        return self.calculate_score(hand)
 
     def stand(self):
-        while self.calculate_score(self.dealer_hand) < 17:  # Dealer hits if score < 17
-            self.hit(self.dealer_hand)
-
+        # If player stands, go to get_winner
         return self.get_winner()
 
     def get_winner(self):
         player_score = self.calculate_score(self.player_hand)
         dealer_score = self.calculate_score(self.dealer_hand)
+        
+        # Dealer hits until he reaches 17
+        while dealer_score != 'Bust':
+            while int(dealer_score) < 17:
+                self.hit(self.dealer_hand)
+                print("Dealer hand after hit (Dealer hits until reaches 17):", self.dealer_hand.all())
+                dealer_score = self.calculate_score(self.dealer_hand)
+                print("Dealer score after hit:", dealer_score)
+                if dealer_score == "Bust":
+                    self.game_winner = "Player"
+                    break
+            break
+            
 
         if player_score == "Bust":
             self.game.winner = "Dealer"
