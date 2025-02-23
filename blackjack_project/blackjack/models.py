@@ -95,7 +95,7 @@ class Deck(models.Model):
         self.cards.remove(card)
         self.save()  # Save the deck after removing the card
 
-        hand.append(card)  # Add the card to the hand
+        hand.add(card)  # Add the card to the hand
 
         return card
     

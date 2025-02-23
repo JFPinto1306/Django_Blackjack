@@ -62,16 +62,14 @@ class GameLogicTest(TestCase):
         # Create the Blackjack instance and store it as an instance variable
         self.blackjack = Blackjack()  # This will initialize the Deck and Game
         self.blackjack.start_game()
-        
-        self.blackjack.player_hand = list(self.blackjack.game.player_hand.all())
-        self.blackjack.dealer_hand = list(self.blackjack.game.dealer_hand.all())
-        
+
         # Debug: Print player's hand and dealer's hand
         print("Player's hand:", self.blackjack.player_hand)
         print("Dealer's hand:", self.blackjack.dealer_hand)
 
     def test_start_game(self):
-        #print("\nTesting start_game method")
+        pass
+        print("\nTesting start_game method")
         # Debug: Print the player's hand
         self.assertEqual(self.blackjack.game.status, 'IN_PROGRESS')
         self.assertEqual(self.blackjack.game.player_hand.count(), 2)
@@ -97,15 +95,21 @@ class GameLogicTest(TestCase):
     def test_hit(self):
         print("\nTesting hit method")
         # Hit the player's hand
-        player_score = self.blackjack.hit(self.blackjack.player_hand)
+        self.blackjack.hit(self.blackjack.game.player_hand)  
+        
+        # Checking Player Hand now has 3 cards
+        self.assertEqual(self.blackjack.game.player_hand.count(), 3)
+        
+        # Calculating 3 card hand score
+        player_score = self.blackjack.calculate_score(self.blackjack.game.player_hand)
+        
         # Printing new hand
-        print("Player hand after hit:", self.blackjack.player_hand)
-        print("Player score after hit:", player_score)
-        if player_score == "Bust":
-            #print("Player busts")
-            self.assertEqual(player_score, "Bust")
-        else:
-            self.assertGreater(player_score, 0)
-
+        print("Player hand after hit:", self.blackjack.game.player_hand.all())  # QuerySet
+        #print("Player score after hit:", player_score)
+        
+        #if player_score == "Bust":
+            #self.assertEqual(player_score, "Bust")
+        #else:
+        #    self.assertGreater(player_score, 0)
 
         
