@@ -18,7 +18,7 @@ class Blackjack:
         score = 0
         for card in hand.all():
             score += card.get_card_value(score)
-        return score if score <= 21 else "Bust"
+        return score 
 
     def start_game(self):
         self.deck.start_deck()
@@ -59,11 +59,6 @@ class Blackjack:
         # Deal one card to the hand
         card = self.deck.deal_card(hand)  # This will deal a card from the deck and add it to the hand
 
-        if card:
-            # The card is already added to the hand in the deal_card method
-            # You don't need to append here, since the deal_card method handles that
-            pass
-
         return self.calculate_score(hand)
 
     def stand(self):
@@ -74,22 +69,24 @@ class Blackjack:
         player_score = self.calculate_score(self.player_hand)
         dealer_score = self.calculate_score(self.dealer_hand)
         
+        if player_score > 21:
+            self.game.winner = "Dealer" 
+        
         # Dealer hits until he reaches 17
-        while dealer_score != 'Bust':
+        while dealer_score <= 21:
             while int(dealer_score) < 17:
                 self.hit(self.dealer_hand)
                 print("Dealer hand after hit (Dealer hits until reaches 17):", self.dealer_hand.all())
                 dealer_score = self.calculate_score(self.dealer_hand)
                 print("Dealer score after hit:", dealer_score)
-                if dealer_score == "Bust":
+                if dealer_score > 21:
                     self.game_winner = "Player"
                     break
             break
             
 
-        if player_score == "Bust":
-            self.game.winner = "Dealer"
-        elif dealer_score == "Bust":
+
+        if dealer_score > 21:
             self.game.winner = "Player"
         elif player_score > dealer_score:
             self.game.winner = "Player"

@@ -16,11 +16,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from .views import GameView, HitView,StandView
+from .views import GameView, PlayerHitView,DealerHitView,WinnerView
 
 
 urlpatterns = [
     path('game/', GameView.as_view(), name='game'),
-    path('hit/', HitView.as_view(), name='hit'),    
-    path('stand/', StandView.as_view(), name='stand'),    
+    path('player_hit/', PlayerHitView.as_view(), name='hit'),    
+    path('dealer_hit/', DealerHitView.as_view(), name='hit'),    
+    path('winner/', WinnerView.as_view(), name='stand'),    
 ]
