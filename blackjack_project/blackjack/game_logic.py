@@ -38,9 +38,22 @@ class Blackjack:
         # Dealing Dealer Hand
         self.deck.deal_card(self.dealer_hand)
         self.deck.deal_card(self.dealer_hand)
+        
+        # Calculate scores
+        player_score = self.calculate_score(self.player_hand)
+        dealer_score = self.calculate_score(self.dealer_hand)
+
+        # Update game with scores
+        self.game.player_score = player_score
+        self.game.dealer_score = dealer_score
+
+
+        print(f"\n\nDebugging Start Game. \n Scores:\n - Player: {player_score}, \n - Dealer: {dealer_score}")  # Debugging line for scores
 
         self.game.status = "IN_PROGRESS"
         self.game.save()
+
+        print(f"Game saved: {self.game.id}, Player Score: {self.game.player_score}, Dealer Score: {self.game.dealer_score}\n\n")  # Debugging line to check if changes persist
 
     def hit(self, hand):
         # Deal one card to the hand

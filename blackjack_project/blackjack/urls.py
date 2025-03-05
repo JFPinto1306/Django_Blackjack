@@ -15,13 +15,12 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
-from django.views.generic import RedirectView
+from django.urls import path
+from .views import GameView, HitView,StandView
 
 
 urlpatterns = [
-    path('admin/', admin.site.urls),  # This works with the default Django admin
-    path('api/', include('blackjack.urls')),  # Include URLs from your `blackjack` app
-    path('', RedirectView.as_view(url='/api/game/', permanent=False)),  # Redirect to game URL
-    
+    path('game/', GameView.as_view(), name='game'),
+    path('hit/', HitView.as_view(), name='hit'),    
+    path('stand/', StandView.as_view(), name='stand'),    
 ]
