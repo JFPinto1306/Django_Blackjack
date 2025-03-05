@@ -34,15 +34,11 @@ class GameView(APIView):
             
         blackjack_game = Blackjack()
         blackjack_game.start_game()
-        
-        
-        # Update the game object with the scores
-        #game.player_score = blackjack_game.calculate_score(game.player_hand)
-        #game.dealer_score = blackjack_game.calculate_score(game.dealer_hand)
-        game.save()
+
+        # Fetch the updated game from the database to ensure it reflects changes
+        game.refresh_from_db()
 
         serializer = GameSerializer(game)
-        #game = Game.objects.last()  # Re-fetching the game to get the latest state
 
         return Response(serializer.data) 
 
