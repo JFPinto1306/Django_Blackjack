@@ -16,12 +16,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from django.views.generic import RedirectView
-
 
 urlpatterns = [
-    path('admin/', admin.site.urls),  # This works with the default Django admin
-    path('api/', include('blackjack.urls')),  # Include URLs from your `blackjack` app
-    path('', RedirectView.as_view(url='/api/game/', permanent=False)),  # Redirect to game URL
-    
+    # Include the URL configurations from the blackjack app
+    path('admin/', admin.site.urls),  # Django admin
+    path('', include('blackjack.urls')),  # Include urls from the blackjack app
 ]
+
+
+

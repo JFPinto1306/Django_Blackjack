@@ -2,8 +2,11 @@ from django.test import TestCase
 from .models import *
 from .game_logic import Blackjack
 from django.db.models import QuerySet
+from rest_framework import status
+from rest_framework.test import APITestCase, APIClient
 
 
+# Done and Working
 class CardModelTest(TestCase):
     def setUp(self):
         self.card = Card.objects.create(value='A', suit='Hearts')
@@ -25,12 +28,12 @@ class CardModelTest(TestCase):
         self.assertEqual(self.card.get_card_value(0), 5)
         #print(f"Card: {self.card}, Value: {self.card.get_card_value(15)}")
         
-        
+# Done and Working      
 class GameModelTest(TestCase):
     def setUp(self):
-        self.deck = Deck.objects.create()
-        self.deck.start_deck()
         self.game = Game.objects.create(status='STARTED')
+        self.deck = Deck.objects.create(game=self.game)
+        self.deck.start_deck()
 
     def test_game_status(self):
         self.assertEqual(self.game.status, 'STARTED')
@@ -54,13 +57,22 @@ class GameModelTest(TestCase):
         self.assertNotIn(card, self.deck.cards.all())
         self.assertIn(card, self.game.player_hand.all())
 
-
-
+# Done and Working
 class GameLogicTest(TestCase):
     def setUp(self):
         # Create the Blackjack instance and store it as an instance variable
         self.blackjack = Blackjack()  # This will initialize the Deck and Game
         self.blackjack.start_game()
+    
+    def test_player_burst(self):
+        # Testing player burst
+        for i in range(10):
+            self.blackjack.hit(self.blackjack.game.player_hand)
+            
+        
+        print("\nTesting player burst")
+        print("Winner:", self.blackjack.get_winner(),'\n\n')
+        self.assertEqual(self.blackjack.get_winner(), 'Dealer')
         
     def test_hit(self):
         
@@ -108,7 +120,6 @@ class GameLogicTest(TestCase):
         else:
             self.assertGreater(dealer_score, 0)  
 
-
     def test_start_game(self):
 
         print("\nTesting start_game method")
@@ -137,5 +148,4 @@ class GameLogicTest(TestCase):
         winner = self.blackjack.get_winner()
         print("Winner:", winner)
         self.assertIn(winner, ['Player', 'Dealer', 'Draw'])
-
-        
+ 

@@ -59,6 +59,7 @@ class Game(models.Model):
 
 
 class Deck(models.Model):
+    game = models.OneToOneField(Game, on_delete=models.CASCADE, related_name='deck')
     cards = models.ManyToManyField(Card)
 
     def shuffle_deck(self):
@@ -70,8 +71,6 @@ class Deck(models.Model):
                 # Create each card instance based on the choices
                 card = Card.objects.create(suit=suit_choice[0], value=value_choice[0])
                 new_cards.append(card)
-
-
 
         # Step 2: Shuffle the deck
         random.shuffle(list(set(new_cards)))  # Shuffle the cards in place
