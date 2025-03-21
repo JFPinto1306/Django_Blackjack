@@ -11,7 +11,6 @@ from .serializers import GameSerializer
 from .game_logic import Blackjack
 
 # Create your views here.
-
 class GameHandler(viewsets.ViewSet):
     # Get a game, either the latest one or by specific game ID
     def retrieve(self, request, pk=None):
